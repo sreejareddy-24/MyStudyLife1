@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStudyLife - Reminders & Alerts</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 15px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            text-align: center;
+        }
+        input, button {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #FF5C5C;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background-color: #D94444;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="schedules.html">Schedules</a>
+        <a href="tasks.html">Task Tracking</a>
+        <a href="timeblocking.html">Time Blocking</a>
+        <a href="prioritysetting.html">Priority Setting</a>
+        <a href="adjustments.html">Flexible Adjustments</a>
+        <a href="login.html">Login</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Reminders & Alerts</h2>
+            <input type="text" id="reminderText" placeholder="Enter Reminder">
+            <input type="datetime-local" id="reminderDate" required>
+            <button onclick="setReminder()">Set Reminder</button>
+            <ul id="reminderList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Function to add a reminder
+        function setReminder() {
+            let reminderText = document.getElementById("reminderText").value;
+            let reminderDate = document.getElementById("reminderDate").value;
+
+            if (reminderText.trim() === "" || reminderDate.trim() === "") {
+                alert("Enter a reminder and set a valid date/time");
+                return;
+            }
+
+            let reminder = {
+                text: reminderText,
+                date: reminderDate
+            };
+
+            // Get current reminders from local storage
+            let reminderList = JSON.parse(localStorage.getItem("reminders")) || [];
+
+            // Add new reminder
+            reminderList.push(reminder);
+
+            // Save updated reminders to local storage
+            localStorage.setItem("reminders", JSON.stringify(reminderList));
+
+            // Update UI with new reminder
+            displayReminders();
+
+            // Clear input fields
+            document.getElementById("reminderText").value = "";
+            document.getElementById("reminderDate").value = "";
+        }
+
+        // Function to remove a reminder
+        function removeReminder(index) {
+            let reminderList = JSON.parse(localStorage.getItem("reminders"));
+            reminderList.splice(index, 1);
+            localStorage.setItem("reminders", JSON.stringify(reminderList));
+            displayReminders(); // Update UI after removing reminder
+        }
+
+        // Function to display reminders
+        function displayReminders() {
+            let reminderList = JSON.parse(localStorage.getItem("reminders")) || [];
+            let listElement = document.getElementById("reminderList");
+            listElement.innerHTML = ""; // Clear the list before displaying new data
+
+            reminderList.forEach((reminder, index) => {
+                let listItem = document.createElement("li");
+                listItem.innerHTML = `${reminder.text} - ${new Date(reminder.date).toLocaleString()} 
+                                      <button class="delete-btn" onclick="removeReminder(${index})">Delete</button>`;
+                listElement.appendChild(listItem);
+            });
+        }
+
+        // Display reminders when page loads
+        window.onload = function() {
+            displayReminders();
+        };
+    </script>
+</body>
+</html>

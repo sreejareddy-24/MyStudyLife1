@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStudyLife - Priority Setting</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 15px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            text-align: center;
+        }
+        select, input, button {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #FF5C5C;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background-color: #D94444;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="schedules.html">Schedules</a>
+        <a href="tasks.html">Task Tracking</a>
+        <a href="timeblocking.html">Time Blocking</a>
+        <a href="reminders.html">Reminders & Alerts</a>
+        <a href="adjustments.html">Flexible Adjustments</a>
+        <a href="login.html">Login</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Priority Setting</h2>
+            <input type="text" id="taskName" placeholder="Enter Task">
+            <select id="priorityLevel">
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <button onclick="setPriority()">Set Priority</button>
+            <ul id="priorityList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Function to add a task with priority
+        function setPriority() {
+            let taskName = document.getElementById("taskName").value;
+            let priorityLevel = document.getElementById("priorityLevel").value;
+
+            if (taskName.trim() === "") {
+                alert("Enter a task name");
+                return;
+            }
+
+            let task = {
+                name: taskName,
+                priority: priorityLevel
+            };
+
+            // Get current list from local storage
+            let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
+            // Add the new task
+            taskList.push(task);
+
+            // Save the updated task list back to local storage
+            localStorage.setItem("tasks", JSON.stringify(taskList));
+
+            // Update the UI with the new task
+            displayTasks();
+            
+            // Clear input fields
+            document.getElementById("taskName").value = "";
+        }
+
+        // Function to remove a task from the list
+        function removeTask(index) {
+            let taskList = JSON.parse(localStorage.getItem("tasks"));
+            taskList.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(taskList));
+            displayTasks(); // Update the UI after removing the task
+        }
+
+        // Function to display tasks from local storage
+        function displayTasks() {
+            let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+            let listElement = document.getElementById("priorityList");
+            listElement.innerHTML = ""; // Clear the list before displaying new data
+
+            taskList.forEach((task, index) => {
+                let listItem = document.createElement("li");
+                listItem.innerHTML = `${task.name} - ${task.priority} <button class="delete-btn" onclick="removeTask(${index})">Delete</button>`;
+                listElement.appendChild(listItem);
+            });
+        }
+
+        // Display tasks when the page loads
+        window.onload = function() {
+            displayTasks();
+        };
+    </script>
+</body>
+</html>

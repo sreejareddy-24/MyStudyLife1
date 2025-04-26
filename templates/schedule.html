@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStudyLife - Schedule</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 15px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            text-align: center;
+        }
+        .card h2 {
+            color: #007BFF;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input, select {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .schedule-list {
+            width: 80%;
+            margin-top: 20px;
+        }
+        .schedule-item {
+            background: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="schedules.html">Schedules</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="reminders.html">Reminders</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Schedule Your Study Sessions</h2>
+            <input type="text" id="subject" placeholder="Enter Subject" required>
+            <input type="datetime-local" id="scheduleTime" required>
+            <button onclick="addSchedule()">Add Schedule</button>
+            <button onclick="clearAllSchedules()">Clear All Schedules</button>
+        </div>
+        <div class="card schedule-list" id="scheduleList">
+            <h2>Your Schedules</h2>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            alert("Logging out...");
+            window.location.href = "index.html";
+        }
+
+        function formatDateTime(datetimeString) {
+            const date = new Date(datetimeString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const year = date.getFullYear();
+
+            let hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12; // Convert 0 => 12
+
+            return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+        }
+
+        function saveSchedules() {
+            let scheduleList = document.getElementById("scheduleList");
+            let schedules = [];
+            scheduleList.querySelectorAll('.schedule-item').forEach(item => {
+                const text = item.querySelector('span').innerText;
+                schedules.push(text);
+            });
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+        }
+
+        function loadSchedules() {
+            let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+            schedules.forEach(text => {
+                createScheduleItem(text);
+            });
+        }
+
+        function createScheduleItem(text) {
+            let scheduleList = document.getElementById("scheduleList");
+            let scheduleItem = document.createElement("div");
+            scheduleItem.classList.add("schedule-item", "fade-in");
+            scheduleItem.innerHTML = `<span>${text}</span> <button onclick="removeSchedule(this)">Delete</button>`;
+            scheduleList.appendChild(scheduleItem);
+        }
+
+        function addSchedule() {
+            let subject = document.getElementById("subject").value;
+            let scheduleTime = document.getElementById("scheduleTime").value;
+            if (subject.trim() === "" || scheduleTime.trim() === "") {
+                alert("Please enter all details");
+                return;
+            }
+
+            let formattedTime = formatDateTime(scheduleTime);
+            let text = `${subject} — ${formattedTime}`;
+            createScheduleItem(text);
+            saveSchedules(); // Save after adding schedule
+
+            document.getElementById("subject").value = "";
+            document.getElementById("scheduleTime").value = "";
+        }
+
+        function removeSchedule(button) {
+            button.parentElement.remove();
+            saveSchedules(); // Save after deleting schedule
+        }
+
+        function clearAllSchedules() {
+            let scheduleList = document.getElementById("scheduleList");
+            scheduleList.innerHTML = ''; // Clear the schedule list on the page
+            localStorage.removeItem('schedules'); // Clear from localStorage
+        }
+
+        // Load schedules when the page loads
+        window.onload = loadSchedules;
+    </script>
+</body>
+</html>

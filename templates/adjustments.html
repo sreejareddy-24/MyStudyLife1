@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStudyLife - Flexible Adjustments</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 15px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            text-align: center;
+        }
+        input, button {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn, .edit-btn {
+            background-color: #FF5C5C;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background-color: #D94444;
+        }
+        .edit-btn {
+            background-color: #FFB84D;
+        }
+        .edit-btn:hover {
+            background-color: #D88C31;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="schedules.html">Schedules</a>
+        <a href="tasks.html">Task Tracking</a>
+        <a href="timeblocking.html">Time Blocking</a>
+        <a href="prioritysetting.html">Priority Setting</a>
+        <a href="reminders.html">Reminders & Alerts</a>
+        <a href="login.html">Login</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Flexible Adjustments</h2>
+            <input type="text" id="taskName" placeholder="Enter Task">
+            <input type="datetime-local" id="taskDate" required>
+            <button onclick="addTask()">Modify Schedule</button>
+            <ul id="taskList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Function to add a task (modify schedule)
+        function addTask() {
+            let taskName = document.getElementById("taskName").value;
+            let taskDate = document.getElementById("taskDate").value;
+
+            if (taskName.trim() === "" || taskDate.trim() === "") {
+                alert("Enter a task and set a valid date/time");
+                return;
+            }
+
+            let task = {
+                name: taskName,
+                date: taskDate
+            };
+
+            // Get current tasks from local storage
+            let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
+            // Add new task
+            taskList.push(task);
+
+            // Save updated tasks to local storage
+            localStorage.setItem("tasks", JSON.stringify(taskList));
+
+            // Update UI with new task
+            displayTasks();
+
+            // Clear input fields
+            document.getElementById("taskName").value = "";
+            document.getElementById("taskDate").value = "";
+        }
+
+        // Function to remove a task
+        function removeTask(index) {
+            let taskList = JSON.parse(localStorage.getItem("tasks"));
+            taskList.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(taskList));
+            displayTasks(); // Update UI after removing task
+        }
+
+        // Function to edit a task
+        function editTask(index) {
+            let taskList = JSON.parse(localStorage.getItem("tasks"));
+            let task = taskList[index];
+            
+            // Pre-fill the inputs with the current task details
+            document.getElementById("taskName").value = task.name;
+            document.getElementById("taskDate").value = task.date;
+
+            // Remove the task after editing
+            removeTask(index);
+        }
+
+        // Function to display tasks
+        function displayTasks() {
+            let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+            let listElement = document.getElementById("taskList");
+            listElement.innerHTML = ""; // Clear the list before displaying new data
+
+            taskList.forEach((task, index) => {
+                let listItem = document.createElement("li");
+                listItem.innerHTML = `${task.name} - ${new Date(task.date).toLocaleString()} 
+                                      <button class="edit-btn" onclick="editTask(${index})">Edit</button>
+                                      <button class="delete-btn" onclick="removeTask(${index})">Delete</button>`;
+                listElement.appendChild(listItem);
+            });
+        }
+
+        // Display tasks when page loads
+        window.onload = function() {
+            displayTasks();
+        };
+    </script>
+</body>
+</html>

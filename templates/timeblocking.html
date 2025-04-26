@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStudyLife - Time Blocking</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        nav {
+            background-color: #007BFF;
+            padding: 15px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            text-align: center;
+        }
+        .card h2 {
+            color: #007BFF;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .time-list {
+            width: 80%;
+            margin-top: 20px;
+        }
+        .time-item {
+            background: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="schedules.html">Schedules</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="timeblocking.html">Time Blocking</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Time Blocking</h2>
+            <input type="text" id="activity" placeholder="Enter Activity" required>
+            <input type="time" id="startTime" required>
+            <input type="time" id="endTime" required>
+            <button onclick="addTimeBlock()">Add Time Block</button>
+        </div>
+        <div class="card time-list" id="timeList">
+            <h2>Your Time Blocks</h2>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            alert("Logging out...");
+            window.location.href = "index.html";
+        }
+
+        // Save time blocks to localStorage
+        function saveTimeBlocks() {
+            let timeList = document.getElementById("timeList");
+            let timeBlocks = [];
+            timeList.querySelectorAll('.time-item').forEach(item => {
+                const text = item.querySelector('span').innerText;
+                timeBlocks.push(text);
+            });
+            localStorage.setItem('timeBlocks', JSON.stringify(timeBlocks));
+        }
+
+        // Load time blocks from localStorage
+        function loadTimeBlocks() {
+            let timeBlocks = JSON.parse(localStorage.getItem('timeBlocks')) || [];
+            timeBlocks.forEach(text => {
+                let timeList = document.getElementById("timeList");
+                let timeItem = document.createElement("div");
+                timeItem.classList.add("time-item");
+                timeItem.innerHTML = `<span>${text}</span> <button onclick="removeTimeBlock(this)">Delete</button>`;
+                timeList.appendChild(timeItem);
+            });
+        }
+
+        // Add new time block
+        function addTimeBlock() {
+            let activity = document.getElementById("activity").value;
+            let startTime = document.getElementById("startTime").value;
+            let endTime = document.getElementById("endTime").value;
+
+            if (activity.trim() === "" || startTime.trim() === "" || endTime.trim() === "") {
+                alert("Please enter all details");
+                return;
+            }
+
+            let timeList = document.getElementById("timeList");
+            let timeItem = document.createElement("div");
+            timeItem.classList.add("time-item");
+            timeItem.innerHTML = `<span>${activity}: ${startTime} - ${endTime}</span> <button onclick="removeTimeBlock(this)">Delete</button>`;
+            timeList.appendChild(timeItem);
+
+            // Save the updated time blocks
+            saveTimeBlocks();
+
+            // Clear input fields
+            document.getElementById("activity").value = "";
+            document.getElementById("startTime").value = "";
+            document.getElementById("endTime").value = "";
+        }
+
+        // Remove time block
+        function removeTimeBlock(button) {
+            button.parentElement.remove();
+            saveTimeBlocks(); // Save after deleting time block
+        }
+
+        // Load time blocks when the page loads
+        window.onload = loadTimeBlocks;
+    </script>
+</body>
+</html>
