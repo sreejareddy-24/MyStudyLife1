@@ -27,19 +27,22 @@ def index():
 def login():
     username = request.form['username']
     password = request.form['password']
+    print(f"Submitted username: {username}, password: {password}")  # for checking
 
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
-    user = c.fetchone()
+    c.execute("SELECT password FROM users WHERE username = ?", (username,))
+    result = c.fetchone()
     conn.close()
 
-    if user:
+    if result and result[0] == password:
         session['username'] = username
         return redirect(url_for('homepage'))
     else:
         flash('Invalid username or password', 'danger')
         return redirect(url_for('index'))
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -114,3 +117,4 @@ def logout():
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
+
